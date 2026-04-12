@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TEAM ZERO Access</title>
+  <style>
+    :root {
+      --bg: #06111f;
+      --line: rgba(123, 180, 255, 0.18);
+      --line-strong: rgba(123, 180, 255, 0.36);
+      --text: #dcecff;
+      --text-dim: #91a7c4;
+      --accent: #6eb6ff;
+      --shadow: 0 20px 60px rgba(0, 0, 0, 0.45);
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+  margin: 0;
+  min-height: 100%;
+  font-family: "Pretendard", "Noto Sans KR", sans-serif;
+  background:
+  linear-gradient(180deg, rgba(3, 9, 20, 0.76), rgba(4, 11, 21, 0.84)),
+  url("./bg.png") center center / cover no-repeat,
+    radial-gradient(circle at top, rgba(56, 114, 182, 0.22), transparent 32%),
+    radial-gradient(circle at 80% 20%, rgba(40, 92, 160, 0.16), transparent 24%),
+    linear-gradient(180deg, #040b15 0%, #06111f 60%, #030914 100%);
+  color: var(--text);
+}
+
+    body {
+      display: grid;
+      place-items: center;
+      padding: 20px;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background:
+        linear-gradient(rgba(110, 182, 255, 0.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(110, 182, 255, 0.035) 1px, transparent 1px);
+      background-size: 36px 36px;
+      mask-image: linear-gradient(to bottom, rgba(0,0,0,0.85), rgba(0,0,0,0.35));
+      pointer-events: none;
+      z-index: 1;
+    }
+
+
+    .shell {
+      width: min(100%, 480px);
+      border: 1px solid var(--line);
+      border-radius: 30px;
+      background: linear-gradient(180deg, rgba(8, 21, 37, 0.76), rgba(6, 16, 29, 0.88));
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(14px);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .shell::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at 15% 15%, rgba(110, 182, 255, 0.1), transparent 22%),
+        radial-gradient(circle at 85% 22%, rgba(110, 182, 255, 0.06), transparent 26%);
+      pointer-events: none;
+    }
+
+    .topbar {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--line);
+      color: var(--text-dim);
+      font-size: 11px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+    }
+
+    .panel {
+      position: relative;
+      z-index: 2;
+      min-height: 720px;
+      padding: 90px 34px 38px;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+    }
+
+    .screen {
+      display: none;
+      width: 100%;
+      max-width: 360px;
+      text-align: center;
+      animation: fadeUp 0.35s ease;
+    }
+
+    .screen.active {
+      display: block;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .panel__header {
+      position: absolute;
+      top: 18px;
+      left: 34px;
+      right: 34px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: var(--text-dim);
+      font-size: 11px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      pointer-events: none;
+      opacity: 0.6;
+      transition: opacity 0.3s ease;
+    }
+
+    .panel__title {
+      font-size: clamp(24px, 3.8vw, 34px);
+      line-height: 1.2;
+      letter-spacing: -0.03em;
+      margin: 0 0 16px;
+      text-wrap: balance;
+    }
+
+    .panel__desc {
+      color: var(--text-dim);
+      font-size: 15px;
+      line-height: 1.8;
+      margin: 0 0 32px;
+    }
+
+    .input-label {
+      display: block;
+      text-align: left;
+      font-size: 12px;
+      letter-spacing: 0.18em;
+      color: var(--text-dim);
+      margin-bottom: 10px;
+      text-transform: uppercase;
+    }
+
+    .text-input {
+      width: 100%;
+      height: 58px;
+      border-radius: 18px;
+      border: 1px solid var(--line-strong);
+      background: rgba(4, 13, 24, 0.9);
+      color: var(--text);
+      padding: 0 18px;
+      font-size: 18px;
+      outline: none;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .text-input:focus {
+      border-color: rgba(110, 182, 255, 0.7);
+      box-shadow: 0 0 0 4px rgba(110, 182, 255, 0.12);
+    }
+
+    .button-row {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 26px;
+    }
+
+    .btn {
+      height: 50px;
+      padding: 0 24px;
+      border-radius: 999px;
+      border: none;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      letter-spacing: 0.04em;
+      transition: transform 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    .btn:hover { transform: translateY(-1px); }
+    .btn:active { transform: translateY(0); }
+
+    .btn-primary {
+      background: linear-gradient(180deg, #9ad3ff, #6eb6ff);
+      color: #03101d;
+      box-shadow: 0 10px 30px rgba(74, 148, 230, 0.28);
+    }
+
+    .btn-secondary {
+      color: var(--text);
+      background: rgba(110, 182, 255, 0.08);
+      border: 1px solid var(--line);
+    }
+
+    .meta-text {
+      margin-top: 18px;
+      color: var(--text-dim);
+      font-size: 13px;
+      line-height: 1.7;
+    }
+
+    .fingerprint-wrap {
+      display: grid;
+      place-items: center;
+      margin: 6px 0 18px;
+    }
+
+    .fingerprint {
+      width: 220px;
+      height: 220px;
+      border-radius: 50%;
+      border: 1px solid var(--line-strong);
+      background:
+        radial-gradient(circle at center, rgba(110, 182, 255, 0.12), rgba(110, 182, 255, 0.02) 56%, transparent 57%),
+        linear-gradient(180deg, rgba(10, 28, 49, 0.95), rgba(7, 19, 33, 0.95));
+      display: grid;
+      place-items: center;
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+      box-shadow: inset 0 0 26px rgba(110, 182, 255, 0.08), 0 0 42px rgba(110, 182, 255, 0.06);
+      transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+    }
+
+    .fingerprint:hover {
+      transform: translateY(-2px) scale(1.01);
+      border-color: rgba(110, 182, 255, 0.52);
+      box-shadow: inset 0 0 30px rgba(110, 182, 255, 0.12), 0 0 52px rgba(110, 182, 255, 0.1);
+    }
+
+    .fingerprint::before,
+    .fingerprint::after {
+      content: "";
+      position: absolute;
+      inset: 20px;
+      border-radius: 50%;
+      border: 1px solid rgba(110, 182, 255, 0.12);
+    }
+
+    .fingerprint::after {
+      inset: 40px;
+      border-color: rgba(110, 182, 255, 0.18);
+    }
+
+    .fingerprint svg {
+      width: 116px;
+      height: 116px;
+      opacity: 0.92;
+      filter: drop-shadow(0 0 12px rgba(110, 182, 255, 0.25));
+    }
+
+    .scan-line {
+      position: absolute;
+      left: 14px;
+      right: 14px;
+      height: 3px;
+      background: linear-gradient(90deg, transparent, rgba(154, 211, 255, 0.95), transparent);
+      opacity: 0;
+      box-shadow: 0 0 18px rgba(154, 211, 255, 0.8);
+    }
+
+    .fingerprint.scanning .scan-line {
+      animation: scanMove 1.3s ease-in-out infinite;
+      opacity: 1;
+    }
+
+    @keyframes scanMove {
+      0% { top: 22px; }
+      50% { top: calc(100% - 25px); }
+      100% { top: 22px; }
+    }
+
+    .scan-status {
+      text-align: center;
+      color: var(--accent);
+      font-size: 13px;
+      margin-top: 16px;
+      min-height: 22px;
+      letter-spacing: 0.06em;
+    }
+
+    .log-list {
+      margin: 24px 0 0;
+      padding: 0;
+      list-style: none;
+      display: grid;
+      gap: 10px;
+      text-align: left;
+    }
+
+    .log-item {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px 14px;
+      border-radius: 14px;
+      border: 1px solid rgba(110, 182, 255, 0.1);
+      background: rgba(6, 16, 29, 0.64);
+      color: var(--text-dim);
+      font-size: 13px;
+    }
+
+    .log-item strong {
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    .success-box {
+      border: 1px solid rgba(143, 208, 255, 0.28);
+      background: linear-gradient(180deg, rgba(12, 33, 56, 0.9), rgba(7, 19, 33, 0.92));
+      border-radius: 20px;
+      padding: 18px;
+      margin: 22px 0;
+    }
+
+    .success-box__label {
+      color: var(--accent);
+      font-size: 11px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .success-box__value {
+      font-size: 20px;
+      font-weight: 700;
+      line-height: 1.5;
+    }
+
+    .name-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 10px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(110, 182, 255, 0.1);
+      border: 1px solid rgba(110, 182, 255, 0.18);
+      color: var(--text);
+      font-size: 13px;
+    }
+
+    @media (max-width: 560px) {
+      body { padding: 14px; }
+      .shell { border-radius: 24px; }
+      .panel { padding: 34px 22px 30px; min-height: 640px; }
+      .panel__title { font-size: 24px; }
+      .fingerprint { width: 190px; height: 190px; }
+      .fingerprint svg { width: 102px; height: 102px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <div class="topbar">
+      <span>HJPD ACCESS</span>
+      <span id="clock">--:--:--</span>
+    </div>
+
+    <div class="panel">
+      <div class="screen active" id="screen-name">
+        <div class="panel__header">
+          <span>IDENTITY ENTRY</span>
+          <span>STEP 01</span>
+        </div>
+        <h2 class="panel__title">접근을 위해 인증하십시오.</h2>
+        <p class="panel__desc">
+          접근 권한 확인을 위해 생체 정보를 대조합니다.<br>
+          스캔 패널을 눌러 인증을 진행하십시오.
+        </p>
+
+        <label class="input-label" for="detectiveName">DETECTIVE NAME</label>
+        <input id="detectiveName" class="text-input" type="text" maxlength="20" placeholder="이름 입력" />
+
+        <div class="button-row">
+          <button class="btn btn-primary" id="toFingerprint">등록 계속</button>
+        </div>
+        <p class="meta-text">※ 이름을 비워두고 진행하면 기본 식별명 "신입 형사"가 자동 적용됩니다.</p>
+      </div>
+
+      <div class="screen" id="screen-fingerprint">
+        <div class="panel__header">
+          <span>FINGERPRINT VERIFICATION</span>
+          <span>STEP 02</span>
+        </div>
+        <h2 class="panel__title">생체 인증을 진행합니다.</h2>
+        <p class="panel__desc">
+          접근 권한 확인을 위해 생체 정보를 대조합니다.<br>
+          스캔 패널을 눌러 인증을 진행하십시오.
+        </p>
+
+        <div class="fingerprint-wrap">
+          <button class="fingerprint" id="fingerprintButton" aria-label="지문 인증 시작">
+            <span class="scan-line"></span>
+            <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <path d="M32 10C23.716 10 17 16.716 17 25V30" stroke="#9AD3FF" stroke-width="2.5" stroke-linecap="round"/>
+              <path d="M32 15C26.477 15 22 19.477 22 25V34" stroke="#9AD3FF" stroke-width="2.5" stroke-linecap="round"/>
+              <path d="M32 20C29.239 20 27 22.239 27 25V39" stroke="#9AD3FF" stroke-width="2.5" stroke-linecap="round"/>
+              <path d="M37 25V38C37 46.284 30.284 53 22 53" stroke="#9AD3FF" stroke-width="2.5" stroke-linecap="round"/>
+              <path d="M42 25V37C42 48.598 32.598 58 21 58" stroke="#9AD3FF" stroke-width="2.5" stroke-linecap="round"/>
+              <path d="M47 25V33C47 47.359 35.359 59 21 59" stroke="#9AD3FF" stroke-width="2.5" stroke-linecap="round"/>
+              <path d="M32 10C40.284 10 47 16.716 47 25V29" stroke="#9AD3FF" stroke-width="2.5" stroke-linecap="round"/>
+            </svg>
+          </button>
+          <div class="scan-status" id="scanStatus">SCAN READY</div>
+        </div>
+
+        <div class="button-row">
+          <button class="btn btn-secondary" id="backToName">이전 단계</button>
+        </div>
+
+        <ul class="log-list" id="scanLogs">
+          <li class="log-item"><strong>STATUS</strong><span>대기 중</span></li>
+          <li class="log-item"><strong>NETWORK</strong><span>하진시 경찰청 내부망 연결 가능</span></li>
+          <li class="log-item"><strong>ACCESS</strong><span>임시 권한 미부여</span></li>
+        </ul>
+      </div>
+
+      <div class="screen" id="screen-complete">
+        <div class="panel__header">
+          <span>ACCESS GRANTED</span>
+          <span>STEP 03</span>
+        </div>
+        <h2 class="panel__title">팀 ZERO 임시 접근<br>권한 승인 완료</h2>
+        <p class="panel__desc">
+          등록이 완료되었습니다.<br>
+          아래 식별명으로 사건 브리핑 화면에 진입할 수 있습니다.
+        </p>
+
+        <div class="success-box">
+          <div class="success-box__label">Assigned Division</div>
+          <div class="success-box__value">미제사건 전담 TF · TEAM ZERO</div>
+          <div class="name-chip"><span id="resultName">신입 형사</span></div>
+        </div>
+
+        <div class="button-row">
+          <button class="btn btn-primary" id="restartFlow">다시 등록</button>
+         <button class="btn btn-secondary" type="button" onclick="window.location.href='character.html'">
+  사건 파일 열람
+</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const screens = {
+      name: document.getElementById('screen-name'),
+      fingerprint: document.getElementById('screen-fingerprint'),
+      complete: document.getElementById('screen-complete')
+    };
+
+    const detectiveNameInput = document.getElementById('detectiveName');
+    const toFingerprintBtn = document.getElementById('toFingerprint');
+    const backToNameBtn = document.getElementById('backToName');
+    const fingerprintButton = document.getElementById('fingerprintButton');
+    const scanStatus = document.getElementById('scanStatus');
+    const scanLogs = document.getElementById('scanLogs');
+    const resultName = document.getElementById('resultName');
+    const restartFlowBtn = document.getElementById('restartFlow');
+    const clock = document.getElementById('clock');
+
+    let savedName = '신입 형사';
+    let scanning = false;
+    let timers = [];
+
+    function showScreen(target) {
+      Object.values(screens).forEach(screen => screen.classList.remove('active'));
+      screens[target].classList.add('active');
+    }
+
+    function normalizeName(value) {
+      const trimmed = value.trim();
+      return trimmed || '신입 형사';
+    }
+
+    function clearTimers() {
+      timers.forEach(timer => clearTimeout(timer));
+      timers = [];
+    }
+
+    function renderLogs(rows) {
+      scanLogs.innerHTML = rows.map(([label, value]) => `
+        <li class="log-item"><strong>${label}</strong><span>${value}</span></li>
+      `).join('');
+    }
+
+    function resetScanPanel() {
+      scanning = false;
+      clearTimers();
+      fingerprintButton.classList.remove('scanning');
+      scanStatus.textContent = 'SCAN READY';
+      renderLogs([
+        ['STATUS', '대기 중'],
+        ['NETWORK', '하진시 경찰청 내부망 연결 가능'],
+        ['ACCESS', '임시 권한 미부여']
+      ]);
+    }
+
+    toFingerprintBtn.addEventListener('click', () => {
+      savedName = normalizeName(detectiveNameInput.value);
+      showScreen('fingerprint');
+      resetScanPanel();
+    });
+
+    backToNameBtn.addEventListener('click', () => {
+      showScreen('name');
+    });
+
+    fingerprintButton.addEventListener('click', () => {
+      if (scanning) return;
+      scanning = true;
+      fingerprintButton.classList.add('scanning');
+      scanStatus.textContent = 'SCANNING...';
+
+      renderLogs([
+        ['STATUS', '생체 정보 분석 중'],
+        ['NETWORK', '내부망 연결 중'],
+        ['ACCESS', '접근 권한 확인 중']
+      ]);
+
+      timers.push(setTimeout(() => {
+        scanStatus.textContent = 'DATA MATCHING...';
+        renderLogs([
+          ['STATUS', '데이터 대조 중'],
+          ['NETWORK', '데이터베이스 동기화'],
+          ['ACCESS', '승인 대기 중']
+        ]);
+      }, 1100));
+
+      timers.push(setTimeout(() => {
+        scanStatus.textContent = 'ACCESS GRANTED';
+        renderLogs([
+          ['STATUS', '인증 완료'],
+          ['NETWORK', '연결 완료'],
+          ['ACCESS', '접근 권한 부여']
+        ]);
+      }, 2400));
+
+      timers.push(setTimeout(() => {
+        resultName.textContent = savedName;
+        fingerprintButton.classList.remove('scanning');
+        showScreen('complete');
+        scanning = false;
+      }, 3200));
+    });
+
+    restartFlowBtn.addEventListener('click', () => {
+      detectiveNameInput.value = savedName === '신입 형사' ? '' : savedName;
+      showScreen('name');
+      resetScanPanel();
+    });
+
+    function updateClock() {
+      const now = new Date();
+      const hh = String(now.getHours()).padStart(2, '0');
+      const mm = String(now.getMinutes()).padStart(2, '0');
+      const ss = String(now.getSeconds()).padStart(2, '0');
+      clock.textContent = `${hh}:${mm}:${ss}`;
+    }
+
+    updateClock();
+    setInterval(updateClock, 1000);
+  </script>
+</body>
+</html>
